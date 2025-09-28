@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:smart_pendant_app/pages/profile_page.dart';
 import 'package:smart_pendant_app/pages/search_page.dart';
-// REMOVED settings_page.dart import
+import 'package:smart_pendant_app/screens/drive_files_screen.dart';
+import 'package:smart_pendant_app/screens/calendar_events_screen.dart';
 import 'package:smart_pendant_app/screens/change_wifi_screen.dart';
 import 'package:smart_pendant_app/screens/login_screen.dart';
 import 'package:smart_pendant_app/screens/manage_voices_screen.dart';
@@ -45,10 +46,11 @@ class MyApp extends StatelessWidget {
         '/wifi_selection': (context) => const WifiSelectionScreen(),
         '/home': (context) => const SearchPage(),
         '/profile': (context) => const ProfilePage(),
-        // REMOVED the /settings route
         '/change_wifi': (context) => ChangeWifiScreen(),
         '/manage_voices': (context) => const ManageVoicesScreen(),
         '/previous_recordings': (context) => PreviousRecordingsScreen(),
+        '/drive_files': (context) => const DriveFilesScreen(),
+        '/calendar_events': (context) => const CalendarEventsScreen(),
       },
     );
   }

@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   Future<void> _handleGoogleSignIn(BuildContext context) async {
-    // --- MOCK LOGIN ---
-    // In a real app, you would use the google_sign_in package here.
-    final String mockUserId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-    
-    // Save the userId locally BEFORE moving to the next step.
-    final storage = LocalStorageService();
-    await storage.saveUserId(mockUserId);
+    // Use the loopback IP address for local development as it's more standard.
+    const String url = 'http://127.0.0.1:3001/api/auth/google';
+    const String callbackUrlScheme = 'kairo';
 
-    print('Mock login successful. UserID: $mockUserId saved locally.');
+    try {
+      final result = await FlutterWebAuth2.authenticate(
+        url: url,
+        callbackUrlScheme: callbackUrlScheme,
+      );
 
-    if (context.mounted) {
-      Navigator.pushReplacementNamed(context, '/onboarding');
+      final String? token = Uri.parse(result).queryParameters['token'];
+
+      if (token != null) {
+        final storage = LocalStorageService();
+        await storage.saveAuthToken(token);
+        if (context.mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      } else {
+        // Handle error
+      }
+    } catch (e) {
+      // Handle error
     }
   }
 

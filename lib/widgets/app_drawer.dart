@@ -54,6 +54,22 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/settings');
             },
           ),
+                    ListTile(
+            leading: const Icon(Icons.drive_eta),
+            title: const Text('Google Drive'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/drive_files');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.calendar_today),
+            title: const Text('Google Calendar'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/calendar_events');
+            },
+          ),
         ],
       ),
     );
