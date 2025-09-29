@@ -1,16 +1,51 @@
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:wifi_iot/wifi_iot.dart';
+import 'package:flutter/foundation.dart';
 
 class PendantApiService {
-  Future<bool> sendWifiCredentials({
+  // The static IP address of the pendant when it's in hotspot mode.
+  static const String _pendantBaseUrl = 'http://192.168.4.1';
+
+  // Scans for and returns a list of nearby Wi-Fi networks.
+  Future<List<WifiNetwork>> getNearbyWifiNetworks() async {
+    // This requires location services to be enabled on Android.
+    final networks = await WiFiForIoTPlugin.loadWifiList();
+    return networks;
+  }
+
+  // Sends the selected home Wi-Fi credentials and userId to the pendant.
+  Future<bool> provisionDevice({
     required String ssid,
     required String password,
     required String userId,
   }) async {
-    // --- DEMO MODE ---
-    // We will pretend to connect and always return true after a short delay.
-    print('--- DEMO MODE: Pretending to send credentials ---');
-    await Future.delayed(const Duration(seconds: 2)); // Simulate a 2-second network delay
-    print('--- DEMO MODE: Connection successful! ---');
-    return true; // This makes it ALWAYS succeed!
+    final url = Uri.parse('$_pendantBaseUrl/save');
+    debugPrint("Provisioning device at $url with SSID: $ssid and UserID: $userId");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: {
+          'ssid': ssid,
+          'pass': password,
+          'userId': userId,
+        },
+      ).timeout(const Duration(seconds: 30));
+
+      debugPrint("Pendant response status: ${response.statusCode}");
+      debugPrint("Pendant response body: ${response.body}");
+
+      // The firmware should return a 200 OK on success.
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint("Error provisioning device: $e");
+      // This could be a timeout or a connection error.
+      return false;
+    }
   }
 }
+

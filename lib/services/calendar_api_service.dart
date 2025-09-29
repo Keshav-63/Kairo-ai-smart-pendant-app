@@ -6,8 +6,8 @@ class CalendarApiService {
   final String _baseUrl = 'http://localhost:3001/api/calendar';
 
   Future<List<dynamic>> listEvents() async {
-    final storage = LocalStorageService();
-    final token = await storage.getAuthToken();
+    final storage = LocalStorageService.instance;
+    final token = storage.getAuthToken();
 
     final response = await http.get(
       Uri.parse('$_baseUrl/events'),

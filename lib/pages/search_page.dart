@@ -1,8 +1,55 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:smart_pendant_app/widgets/app_drawer.dart';
+import 'package:app_links/app_links.dart';
 
-class SearchPage extends StatelessWidget {
+class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
+
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  final _appLinks = AppLinks();
+  StreamSubscription<Uri>? _linkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDeepLinks();
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _initDeepLinks() async {
+    // Handle initial deep link when the app is launched from a cold state
+    final uri = await _appLinks.getInitialLink();
+    if (uri != null) {
+      _handleDeepLink(uri);
+    }
+
+    // Handle deep links when the app is already running
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      _handleDeepLink(uri);
+    });
+  }
+
+  void _handleDeepLink(Uri uri) {
+    if (!mounted) return;
+    
+    print('Deep link received: $uri');
+    // You can add navigation logic here based on the URI
+    // For now, we'll just show a SnackBar as a confirmation.
+    final message = 'Deep link handled: ${uri.host}${uri.path}';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +133,6 @@ class SuggestionChip extends StatelessWidget {
   final String label;
   final IconData icon;
 
-  // ADDED const to this constructor
   const SuggestionChip({super.key, required this.label, required this.icon});
 
   @override

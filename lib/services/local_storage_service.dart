@@ -1,31 +1,69 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart'; // For debugPrint
 
 class LocalStorageService {
+  static LocalStorageService? _instance;
+  static SharedPreferences? _preferences;
+
   static const String _userIdKey = 'userId';
   static const String _authTokenKey = 'authToken';
+  static const String _onboardingCompleteKey = 'onboardingComplete';
 
-  Future<void> saveUserId(String userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_userIdKey, userId);
+  // Private constructor
+  LocalStorageService._();
+
+  // Singleton accessor
+  static LocalStorageService get instance {
+    if (_instance == null) {
+      throw Exception("LocalStorageService not initialized. Call LocalStorageService.init() in main.");
+    }
+    return _instance!;
   }
 
-  Future<String?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_userIdKey);
+  // One-time initialization
+  static Future<void> init() async {
+    if (_instance == null) {
+      debugPrint("Initializing LocalStorageService...");
+      _instance = LocalStorageService._();
+      _preferences = await SharedPreferences.getInstance();
+      debugPrint("LocalStorageService Initialized.");
+    }
+  }
+
+  // Helper method to get preferences instance
+  SharedPreferences _getPrefs() {
+    if (_preferences == null) {
+      throw Exception("SharedPreferences not initialized.");
+    }
+    return _preferences!;
+  }
+
+  Future<void> saveUserId(String userId) async {
+    await _getPrefs().setString(_userIdKey, userId);
+  }
+
+  String? getUserId() {
+    return _getPrefs().getString(_userIdKey);
   }
 
   Future<void> saveAuthToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_authTokenKey, token);
+    await _getPrefs().setString(_authTokenKey, token);
   }
 
-  Future<String?> getAuthToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_authTokenKey);
+  String? getAuthToken() {
+    return _getPrefs().getString(_authTokenKey);
   }
 
-  Future<void> clearAuthToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_authTokenKey);
+  Future<void> clearAllData() async {
+    await _getPrefs().clear();
+    debugPrint("All data cleared from local storage.");
+  }
+
+  Future<void> setHasCompletedOnboarding(bool completed) async {
+    await _getPrefs().setBool(_onboardingCompleteKey, completed);
+  }
+
+  bool hasCompletedOnboarding() {
+    return _getPrefs().getBool(_onboardingCompleteKey) ?? false;
   }
 }
