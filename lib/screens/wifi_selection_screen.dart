@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smart_pendant_app/services/pendant_api_service.dart';
-import 'package:wifi_iot/wifi_iot.dart';
+import 'package:wifi_scan/wifi_scan.dart';
 import 'package:flutter/foundation.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
+import 'package:wifi_iot/wifi_iot.dart';
 
 class WifiSelectionScreen extends StatefulWidget {
   final String userId;
@@ -15,7 +16,7 @@ class WifiSelectionScreen extends StatefulWidget {
 
 class _WifiSelectionScreenState extends State<WifiSelectionScreen> {
   final PendantApiService _pendantApi = PendantApiService();
-  List<WifiNetwork>? _wifiNetworks;
+  List<WiFiAccessPoint>? _wifiNetworks;
   bool _isScanning = true;
   bool _isProvisioning = false;
   String? _provisioningStatus;
@@ -33,10 +34,10 @@ class _WifiSelectionScreenState extends State<WifiSelectionScreen> {
     try {
       final networks = await _pendantApi.getNearbyWifiNetworks();
       debugPrint("[WifiSelectionScreen] Found ${networks.length} networks.");
-      final uniqueNetworks = <String, WifiNetwork>{};
+      final uniqueNetworks = <String, WiFiAccessPoint>{};
       for (var network in networks) {
-        if (network.ssid != null && network.ssid!.isNotEmpty) {
-          uniqueNetworks[network.ssid!] = network;
+        if (network.ssid.isNotEmpty) {
+          uniqueNetworks[network.ssid] = network;
         }
       }
       setState(() {
@@ -57,7 +58,12 @@ class _WifiSelectionScreenState extends State<WifiSelectionScreen> {
       _provisioningStatus = 'Sending credentials to Kairo...';
     });
     debugPrint("[WifiSelectionScreen] Starting provisioning for SSID: $ssid");
-
+    // --- FIX STARTS HERE ---
+    // Re-assert that we want to use the Wi-Fi network for this connection.
+    // This is crucial on some Android versions.
+    await WiFiForIoTPlugin.forceWifiUsage(true);
+    await Future.delayed(const Duration(milliseconds: 500)); // Small delay for the network to bind
+    // --- FIX ENDS HERE ---
     final success = await _pendantApi.provisionDevice(
       ssid: ssid,
       password: password,
@@ -185,13 +191,13 @@ class _WifiSelectionScreenState extends State<WifiSelectionScreen> {
                       itemCount: _wifiNetworks!.length,
                       itemBuilder: (context, index) {
                         final network = _wifiNetworks![index];
-                        if (network.ssid == null || network.ssid!.isEmpty) {
+                        if (network.ssid.isEmpty) {
                           return const SizedBox.shrink();
                         }
                         return ListTile(
                           leading: const Icon(Icons.wifi),
-                          title: Text(network.ssid!, style: GoogleFonts.oxanium()),
-                          onTap: () => _showPasswordDialog(network.ssid!),
+                          title: Text(network.ssid, style: GoogleFonts.oxanium()),
+                          onTap: () => _showPasswordDialog(network.ssid),
                         );
                       },
                     ),

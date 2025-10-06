@@ -26,6 +26,7 @@ dependencies:
   collection: ^1.18.0
   mobile_scanner: ^5.1.1 # Added for QR code scanning
   wifi_iot: ^0.3.19
+  wifi_scan: ^0.4.1+2 # For scanning for Wi-Fi networks
 
 # Here is how you can implement a carousel for your app. The changes involve creating a new screen for the onboarding experience and updating your app's navigation flow to include it right after the login process.
 

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:wifi_iot/wifi_iot.dart';
+import 'package:wifi_scan/wifi_scan.dart';
 import 'package:flutter/foundation.dart';
 
 class PendantApiService {
@@ -8,10 +8,13 @@ class PendantApiService {
   static const String _pendantBaseUrl = 'http://192.168.4.1';
 
   // Scans for and returns a list of nearby Wi-Fi networks.
-  Future<List<WifiNetwork>> getNearbyWifiNetworks() async {
-    // This requires location services to be enabled on Android.
-    final networks = await WiFiForIoTPlugin.loadWifiList();
-    return networks;
+  Future<List<WiFiAccessPoint>> getNearbyWifiNetworks() async {
+    final canScan = await WiFiScan.instance.canStartScan();
+    if (canScan != CanStartScan.yes) {
+      return [];
+    }
+    await WiFiScan.instance.startScan();
+    return await WiFiScan.instance.getScannedResults();
   }
 
   // Sends the selected home Wi-Fi credentials and userId to the pendant.
@@ -34,7 +37,7 @@ class PendantApiService {
           'pass': password,
           'userId': userId,
         },
-      ).timeout(const Duration(seconds: 30));
+      ).timeout(const Duration(seconds: 45));
 
       debugPrint("Pendant response status: ${response.statusCode}");
       debugPrint("Pendant response body: ${response.body}");
@@ -48,4 +51,3 @@ class PendantApiService {
     }
   }
 }
-
