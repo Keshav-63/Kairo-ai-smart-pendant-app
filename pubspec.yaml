@@ -27,13 +27,24 @@ dependencies:
   mobile_scanner: ^5.1.1 # Added for QR code scanning
   wifi_iot: ^0.3.19
   wifi_scan: ^0.4.1+2 # For scanning for Wi-Fi networks
-
+  flutter_markdown: ^0.7.3
 # Here is how you can implement a carousel for your app. The changes involve creating a new screen for the onboarding experience and updating your app's navigation flow to include it right after the login process.
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.10.0
+  flutter_markdown: '^0.7.7+1'
+# ...existing code...
+
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/kairo-logo.png"
+# ...existing code...
 
 flutter:
   uses-material-design: true
@@ -45,4 +56,5 @@ flutter:
     - assets/onboarding_1.png
     - assets/onboarding_2.png
     - assets/onboarding_3.png
+    - assets/kairo-logo.png
   
