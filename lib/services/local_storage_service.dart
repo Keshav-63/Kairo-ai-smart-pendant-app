@@ -24,13 +24,12 @@ class LocalStorageService {
   }
 
   // One-time initialization
+  // One-time initialization
   static Future<void> init() async {
     if (_instance == null) {
       debugPrint("Initializing LocalStorageService...");
       _instance = LocalStorageService._();
       _preferences = await SharedPreferences.getInstance();
-      // Automatically set onboarding as complete
-      await _instance!.setHasCompletedOnboarding(true);
       debugPrint("LocalStorageService Initialized.");
     }
   }
