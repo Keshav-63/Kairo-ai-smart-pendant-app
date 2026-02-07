@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 
@@ -83,6 +85,20 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
 
   void _applyFilters() {
     final s = searchTerm.toLowerCase();
+    bool listContains(dynamic v) {
+      if (v == null) return false;
+      if (v is List) {
+        return v.any((e) {
+          if (e == null) return false;
+          if (e is Map && e['quote'] != null) {
+            return e['quote'].toString().toLowerCase().contains(s);
+          }
+          return e.toString().toLowerCase().contains(s);
+        });
+      }
+      return v.toString().toLowerCase().contains(s);
+    }
+
     filtered = memories.where((m) {
       if (m == null) return false;
       final title = (m['title'] ?? '').toString().toLowerCase();
@@ -92,7 +108,11 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
       final searchMatch = s.isEmpty ||
           title.contains(s) ||
           summary.contains(s) ||
-          mom.contains(s);
+          mom.contains(s) ||
+          listContains(m['key_points']) ||
+          listContains(m['key_takeaways']) ||
+          listContains(m['action_items']) ||
+          listContains(m['key_quotes']);
 
       final dateMatch = dateFilter.isEmpty ||
           (m['created_at']?['\u0024date']?.toString() ?? '')
@@ -126,19 +146,57 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
+                        Expanded(
                           child: Text(memory['title'] ?? 'Memory',
-                              style: GoogleFonts.oxanium(
-                                  fontSize: 20, fontWeight: FontWeight.bold))),
-                      IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.of(context).pop()),
+                            style: GoogleFonts.oxanium(
+                              fontSize: 20, fontWeight: FontWeight.bold))),
+                        Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            tooltip: 'Copy (without transcript)',
+                            icon: const Icon(Icons.copy),
+                            onPressed: () => _copyMemoryToClipboard(memory, context)),
+                          IconButton(
+                            tooltip: 'Share (without transcript)',
+                            icon: const Icon(Icons.share),
+                            onPressed: () => _shareMemoryText(memory)),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.of(context).pop()),
+                        ],
+                        ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text((memory['created_at']?['\u0024date'] ?? '').toString(),
-                      style: const TextStyle(color: Colors.white70)),
-                  const SizedBox(height: 12),
+                  Builder(builder: (context) {
+                    final createdRaw = memory['created_at']?['\u0024date']?.toString() ?? '';
+                    DateTime dt;
+                    try {
+                      dt = DateTime.parse(createdRaw);
+                    } catch (_) {
+                      dt = DateTime.fromMillisecondsSinceEpoch(0);
+                    }
+                    final durationStr = (memory['duration'] ?? memory['length'] ?? '').toString();
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(_formatDateHeader(dt), style: const TextStyle(color: Colors.white70)),
+                            const SizedBox(width: 8),
+                            Text('•', style: const TextStyle(color: Colors.white24)),
+                            const SizedBox(width: 8),
+                            Text(_formatTime(dt), style: const TextStyle(color: Colors.white70)),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        if (durationStr.isNotEmpty)
+                          Text(durationStr, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                        const SizedBox(height: 6),
+                      ],
+                    );
+                  }),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
@@ -190,6 +248,64 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
                                         '- ${a.toString()}',
                                         style: const TextStyle(
                                             color: Colors.white70))))),
+                            const SizedBox(height: 12),
+                          ],
+                          if (memory['key_points'] != null &&
+                              (memory['key_points'] is List) &&
+                              (memory['key_points'] as List).isNotEmpty) ...[
+                            const Text('Key Points',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 6),
+                            ...((memory['key_points'] as List).map((p) =>
+                                Padding(
+                                    padding: const EdgeInsets.only(bottom: 6.0),
+                                    child: Text('- ${p.toString()}',
+                                        style: const TextStyle(
+                                            color: Colors.white70))))),
+                            const SizedBox(height: 12),
+                          ],
+                          if (memory['key_takeaways'] != null &&
+                              (memory['key_takeaways'] is List) &&
+                              (memory['key_takeaways'] as List).isNotEmpty) ...[
+                            const Text('Key Takeaways',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 6),
+                            ...((memory['key_takeaways'] as List).map((t) =>
+                                Padding(
+                                    padding: const EdgeInsets.only(bottom: 6.0),
+                                    child: Text('- ${t.toString()}',
+                                        style: const TextStyle(
+                                            color: Colors.white70))))),
+                            const SizedBox(height: 12),
+                          ],
+                          if (memory['key_quotes'] != null &&
+                              (memory['key_quotes'] is List) &&
+                              (memory['key_quotes'] as List).isNotEmpty) ...[
+                            const Text('Key Quotes',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 6),
+                            ...((memory['key_quotes'] as List).map((q) {
+                              String quoteText = '';
+                              if (q == null) {
+                                quoteText = '';
+                              } else if (q is Map && q['quote'] != null) {
+                                quoteText = q['quote'].toString();
+                              } else {
+                                quoteText = q.toString();
+                              }
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                      color: const Color(0xFF0B1220),
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: Text('"$quoteText"',
+                                      style: const TextStyle(
+                                          color: Colors.white70, fontStyle: FontStyle.italic)),
+                                ),
+                              );
+                            })),
                             const SizedBox(height: 12),
                           ],
                           if ((memory['full_transcription'] ?? '')
@@ -326,6 +442,45 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
     return '$hour:$minute $ampm';
   }
 
+  String _memoryToShareableJson(dynamic memory) {
+    try {
+      if (memory is Map) {
+        final copy = Map<String, dynamic>.from(memory.cast<String, dynamic>());
+        copy.remove('full_transcription');
+        // also remove alternate keys if present
+        copy.remove('full_transcript');
+        return const JsonEncoder.withIndent('  ').convert(copy);
+      }
+      return const JsonEncoder.withIndent('  ').convert(memory);
+    } catch (e) {
+      try {
+        return jsonEncode(memory);
+      } catch (_) {
+        return memory.toString();
+      }
+    }
+  }
+
+  Future<void> _copyMemoryToClipboard(dynamic memory, BuildContext dialogContext) async {
+    final text = _memoryToShareableJson(memory);
+    await Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(dialogContext).showSnackBar(const SnackBar(content: Text('Memory copied (transcript omitted)')));
+  }
+
+  Future<void> _shareMemoryText(dynamic memory) async {
+    final text = _memoryToShareableJson(memory);
+    final subject = (memory is Map && memory['title'] != null) ? memory['title'].toString() : 'Memory';
+    await Share.share(text, subject: subject);
+  }
+
+  Color _sentimentColor(dynamic sentiment) {
+    if (sentiment == null) return Colors.white24;
+    final label = (sentiment['label'] ?? '').toString().toLowerCase();
+    if (label.contains('positive')) return const Color(0xFF00D38A);
+    if (label.contains('negative')) return Colors.redAccent;
+    return const Color(0xFFFFC107);
+  }
+
   Widget _buildMemoryListTile(dynamic memory) {
     final createdRaw = memory['created_at']?['\u0024date']?.toString() ?? '';
     DateTime dt;
@@ -338,51 +493,60 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
     final duration = (memory['duration'] ?? memory['length'] ?? '').toString();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
       child: InkWell(
         onTap: () => _openMemoryDetail(memory),
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFF101214),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white12),
+            color: const Color(0xFF0F1416),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.4),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              )
+            ],
           ),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(memory['title'] ?? 'Untitled',
-                        style: GoogleFonts.oxanium(
-                            fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(memory['title'] ?? 'Untitled',
+                            style: GoogleFonts.oxanium(
+                                fontSize: 16, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 6),
+                        Text(memory['summary'] ?? '',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 8),
                   const Icon(Icons.chevron_right, color: Color(0xFF00D38A)),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text(memory['summary'] ?? '',
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white70)),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Text(timeStr,
-                      style:
-                          const TextStyle(color: Colors.white54, fontSize: 12)),
+                      style: const TextStyle(color: Colors.white54, fontSize: 12)),
                   if (duration.isNotEmpty) ...[
                     const SizedBox(width: 8),
                     const Text('•', style: TextStyle(color: Colors.white24)),
                     const SizedBox(width: 8),
                     Text(duration,
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 12)),
-                  ]
+                        style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  ],
                 ],
               ),
             ],
@@ -396,55 +560,119 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('Memories', style: GoogleFonts.oxanium()),
-          backgroundColor: Colors.transparent),
+          title: Text('Memories', style: GoogleFonts.oxanium(fontSize: 24, fontWeight: FontWeight.bold)),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: false),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(children: [
-          Row(children: [
-            Expanded(
-              child: TextField(
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
-                    hintText: 'Search memories...'),
-                onChanged: (v) => setState(() {
-                  searchTerm = v;
-                  _applyFilters();
-                }),
-              ),
+          // Enhanced Filter Header
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F1416),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.white10),
             ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 140,
-              child: TextField(
-                decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.calendar_today),
-                    hintText: 'YYYY-MM-DD'),
-                onChanged: (v) => setState(() {
-                  dateFilter = v;
-                  _applyFilters();
-                }),
-              ),
-            ),
-            const SizedBox(width: 8),
-            DropdownButton<String>(
-              value: sentimentFilter,
-              items: const [
-                DropdownMenuItem(value: 'all', child: Text('All')),
-                DropdownMenuItem(value: 'positive', child: Text('Positive')),
-                DropdownMenuItem(value: 'neutral', child: Text('Neutral')),
-                DropdownMenuItem(value: 'negative', child: Text('Negative')),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                // Search Field
+                TextField(
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF00D38A)),
+                    hintText: 'Search memories...',
+                    hintStyle: const TextStyle(color: Colors.white54),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFF1A1F2B)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFF00D38A), width: 2),
+                    ),
+                    filled: true,
+                    fillColor: const Color(0xFF0D0D12),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  ),
+                  onChanged: (v) => setState(() {
+                    searchTerm = v;
+                    _applyFilters();
+                  }),
+                ),
+                const SizedBox(height: 10),
+                // Filter Row: Date and Sentiment
+                Row(
+                  children: [
+                    // Date Filter
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.calendar_today, color: Color(0xFF00D38A)),
+                          hintText: 'YYYY-MM-DD',
+                          hintStyle: const TextStyle(color: Colors.white54),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Color(0xFF1A1F2B)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(color: Color(0xFF00D38A), width: 2),
+                          ),
+                          filled: true,
+                          fillColor: const Color(0xFF0D0D12),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                        ),
+                        onChanged: (v) => setState(() {
+                          dateFilter = v;
+                          _applyFilters();
+                        }),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Sentiment Filter
+                    Expanded(
+                      flex: 1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFF1A1F2B)),
+                          borderRadius: BorderRadius.circular(10),
+                          color: const Color(0xFF0D0D12),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: sentimentFilter,
+                            isExpanded: true,
+                            icon: const Icon(Icons.filter_list, color: Color(0xFF00D38A), size: 20),
+                            dropdownColor: const Color(0xFF0F1416),
+                            style: const TextStyle(color: Colors.white, fontSize: 13),
+                            items: const [
+                              DropdownMenuItem(value: 'all', child: Text('All')),
+                              DropdownMenuItem(value: 'positive', child: Text('Positive')),
+                              DropdownMenuItem(value: 'neutral', child: Text('Neutral')),
+                              DropdownMenuItem(value: 'negative', child: Text('Negative')),
+                            ],
+                            onChanged: (v) {
+                              if (v == null) return;
+                              setState(() {
+                                sentimentFilter = v;
+                                _applyFilters();
+                              });
+                            },
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                      ),
+                    ),
+                  ],
+                ),
               ],
-              onChanged: (v) {
-                if (v == null) return;
-                setState(() {
-                  sentimentFilter = v;
-                  _applyFilters();
-                });
-              },
             ),
-          ]),
-          const SizedBox(height: 12),
+          ),
+          const SizedBox(height: 16),
           Expanded(
             child: loading
                 ? const Center(child: CircularProgressIndicator())

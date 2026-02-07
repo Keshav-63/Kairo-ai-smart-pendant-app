@@ -49,6 +49,21 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
+    // Rename APK outputs to include version name and code (e.g. app-release-v1.0.0+2.apk)
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            try {
+                val vName = variant.versionName ?: defaultConfig.versionName
+                val vCode = variant.versionCode ?: defaultConfig.versionCode
+                val newName = "app-${variant.name}-v${vName}+${vCode}.apk"
+                (this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl)?.outputFileName = newName
+            } catch (e: Exception) {
+                // ignore on older AGP where internal API isn't present
+            }
+        }
+    }
 }
 
 flutter {
