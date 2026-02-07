@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:wifi_iot/wifi_iot.dart';
-import 'package:flutter/foundation.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 
 class QrScannerScreen extends StatefulWidget {

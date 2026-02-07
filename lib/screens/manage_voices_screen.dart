@@ -179,7 +179,7 @@ class _ManageVoicesScreenState extends State<ManageVoicesScreen> {
               TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Name')),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                value: selectedRelationship,
+                initialValue: selectedRelationship,
                 items: relationships.map((String value) {
                   return DropdownMenuItem<String>(value: value, child: Text(value));
                 }).toList(),

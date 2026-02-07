@@ -89,7 +89,7 @@
     
 //     // Using 'localhost' which is generally more reliable for iOS simulators and can be
 //     // forwarded on Android emulators (adb reverse tcp:3001 tcp:3001)
-//     final url = Uri.parse('http://localhost:3001/api/auth/google');
+//     final url = Uri.parse('https://shreeyanshsingh-raghuvanshi-kairob.hf.space/api/auth/google');
 
 //     // Launch the URL. The AuthWrapper will handle the redirect.
 //     if (await canLaunchUrl(url)) {
@@ -287,7 +287,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     await _playLoginClickSound();
     setState(() => _isLoading = true);
 
-    final url = Uri.parse('http://localhost:3001/api/auth/google');
+    final url = Uri.parse('https://shreeyanshsingh-raghuvanshi-kairob.hf.space/api/auth/google');
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);

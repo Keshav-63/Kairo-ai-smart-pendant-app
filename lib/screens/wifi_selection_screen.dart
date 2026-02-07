@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smart_pendant_app/services/pendant_api_service.dart';
 import 'package:wifi_scan/wifi_scan.dart';
-import 'package:flutter/foundation.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 import 'package:wifi_iot/wifi_iot.dart';
 

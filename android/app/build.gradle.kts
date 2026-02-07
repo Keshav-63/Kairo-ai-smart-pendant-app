@@ -19,7 +19,7 @@ subprojects {
 
 android {
     namespace = "com.example.smart_pendant_app"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -37,7 +37,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
-        targetSdk = 35
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -47,6 +47,21 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    // Rename APK outputs to include version name and code (e.g. app-release-v1.0.0+2.apk)
+    applicationVariants.all {
+        val variant = this
+        variant.outputs.all {
+            try {
+                val vName = variant.versionName ?: defaultConfig.versionName
+                val vCode = variant.versionCode ?: defaultConfig.versionCode
+                val newName = "app-${variant.name}-v${vName}+${vCode}.apk"
+                (this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl)?.outputFileName = newName
+            } catch (e: Exception) {
+                // ignore on older AGP where internal API isn't present
+            }
         }
     }
 }

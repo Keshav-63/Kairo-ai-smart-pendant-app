@@ -161,7 +161,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:app_links/app_links.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
-import 'package:flutter/foundation.dart'; // For debugPrint
+// For debugPrint
 import 'package:smart_pendant_app/screens/login_screen.dart';
 import 'package:smart_pendant_app/screens/onboarding_carousel_screen.dart';
 import 'package:smart_pendant_app/pages/search_page.dart'; // This is the home page

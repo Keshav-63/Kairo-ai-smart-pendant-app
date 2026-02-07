@@ -72,10 +72,11 @@ import 'package:smart_pendant_app/screens/previous_recordings_screen.dart';
 import 'package:smart_pendant_app/screens/qr_scanner_screen.dart';
 import 'package:smart_pendant_app/screens/wifi_selection_screen.dart';
 import 'package:smart_pendant_app/screens/onboarding_carousel_screen.dart';
+import 'package:smart_pendant_app/screens/memories_screen.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 
 void main() async {
-    // CRITICAL FIX: Ensures that plugin services are initialized before runApp()
+  // CRITICAL FIX: Ensures that plugin services are initialized before runApp()
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize the storage service once when the app starts.
@@ -130,8 +131,8 @@ class MyApp extends StatelessWidget {
         '/previous_recordings': (context) => PreviousRecordingsScreen(),
         '/drive_files': (context) => const DriveFilesScreen(),
         '/calendar_events': (context) => const CalendarEventsScreen(),
+        '/memories': (context) => const MemoriesScreen(),
       },
     );
   }
 }
-

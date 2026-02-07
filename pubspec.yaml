@@ -1,7 +1,7 @@
 name: smart_pendant_app
 description: "A new Flutter project."
 publish_to: 'none' 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.2.0 <4.0.0' # Check your Flutter version, this is a safe range
@@ -18,6 +18,7 @@ dependencies:
   url_launcher: ^6.3.2
   google_fonts: ^6.2.1 
   video_player: ^2.2.19
+  share_plus: ^8.0.0
   animate_do: ^3.3.4
   sensors_plus: ^5.0.1
   audioplayers: ^6.0.0
