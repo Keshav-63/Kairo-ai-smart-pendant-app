@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/app_theme.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -6,9 +7,9 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // THEME UPDATE
+      backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text('Settings', style: AppTheme.headingMedium),
       ),
       body: ListView(
         children: [

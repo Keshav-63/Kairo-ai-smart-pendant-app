@@ -8,6 +8,9 @@ class LocalStorageService {
   static const String _userIdKey = 'userId';
   static const String _authTokenKey = 'authToken';
   static const String _onboardingCompleteKey = 'onboardingComplete';
+  static const String _userNameKey = 'userName';
+  static const String _userEmailKey = 'userEmail';
+  static const String _userAvatarKey = 'userAvatar';
 
   // Private constructor
   LocalStorageService._();
@@ -26,6 +29,8 @@ class LocalStorageService {
       debugPrint("Initializing LocalStorageService...");
       _instance = LocalStorageService._();
       _preferences = await SharedPreferences.getInstance();
+      // Automatically set onboarding as complete
+      await _instance!.setHasCompletedOnboarding(true);
       debugPrint("LocalStorageService Initialized.");
     }
   }
@@ -65,5 +70,29 @@ class LocalStorageService {
 
   bool hasCompletedOnboarding() {
     return _getPrefs().getBool(_onboardingCompleteKey) ?? false;
+  }
+
+  Future<void> saveUserName(String name) async {
+    await _getPrefs().setString(_userNameKey, name);
+  }
+
+  String? getUserName() {
+    return _getPrefs().getString(_userNameKey);
+  }
+
+  Future<void> saveUserEmail(String email) async {
+    await _getPrefs().setString(_userEmailKey, email);
+  }
+
+  String? getUserEmail() {
+    return _getPrefs().getString(_userEmailKey);
+  }
+
+  Future<void> saveUserAvatar(String avatarUrl) async {
+    await _getPrefs().setString(_userAvatarKey, avatarUrl);
+  }
+
+  String? getUserAvatar() {
+    return _getPrefs().getString(_userAvatarKey);
   }
 }

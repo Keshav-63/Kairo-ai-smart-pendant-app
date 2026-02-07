@@ -161,6 +161,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:app_links/app_links.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 // For debugPrint
 import 'package:smart_pendant_app/screens/login_screen.dart';
 import 'package:smart_pendant_app/screens/onboarding_carousel_screen.dart';
@@ -240,6 +242,16 @@ class _AuthWrapperState extends State<AuthWrapper> {
       if (currentToken != null && currentToken.isNotEmpty) {
         final hasCompleted = storage.hasCompletedOnboarding();
         debugPrint("[AuthWrapper] _checkStoredToken: Token found. Onboarding completed: $hasCompleted");
+        
+        // Fetch user profile if not already saved
+        final userName = storage.getUserName();
+        if (userName == null || userName.isEmpty || userName == 'User') {
+          debugPrint("[AuthWrapper] _checkStoredToken: User data not found, fetching from Google...");
+          await _fetchGoogleUserProfile(currentToken);
+        } else {
+          debugPrint("[AuthWrapper] _checkStoredToken: User data already exists: $userName");
+        }
+        
         setState(() {
           _hasCompletedOnboarding = hasCompleted;
           _authStatus = AuthStatus.authenticated;
@@ -267,6 +279,9 @@ class _AuthWrapperState extends State<AuthWrapper> {
       await storage.saveUserId(userId);
       debugPrint("[AuthWrapper] _handleAuthRedirect: Token and userId saved.");
 
+      // Fetch user profile data from Google using access token
+      await _fetchGoogleUserProfile(token);
+
       final bool needsOnboarding = isNewUser || !storage.hasCompletedOnboarding();
       
       if (isNewUser) {
@@ -291,6 +306,48 @@ class _AuthWrapperState extends State<AuthWrapper> {
           _authStatus = AuthStatus.unauthenticated;
         });
       }
+    }
+  }
+
+  /// Fetches user profile data from Google using access token
+  Future<void> _fetchGoogleUserProfile(String accessToken) async {
+    try {
+      debugPrint("[AuthWrapper] Fetching user profile from Google API");
+      final url = Uri.parse('https://www.googleapis.com/oauth2/v2/userinfo');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final storage = LocalStorageService.instance;
+        
+        debugPrint("[AuthWrapper] Google API response: ${response.body}");
+        
+        // Save user data to local storage
+        if (data['name'] != null) {
+          await storage.saveUserName(data['name']);
+          debugPrint("[AuthWrapper] Saved user name: ${data['name']}");
+        }
+        if (data['email'] != null) {
+          await storage.saveUserEmail(data['email']);
+          debugPrint("[AuthWrapper] Saved user email: ${data['email']}");
+        }
+        if (data['picture'] != null) {
+          await storage.saveUserAvatar(data['picture']);
+          debugPrint("[AuthWrapper] Saved user avatar: ${data['picture']}");
+        }
+      } else {
+        debugPrint("[AuthWrapper] Failed to fetch Google user profile: ${response.statusCode}");
+        debugPrint("[AuthWrapper] Response: ${response.body}");
+      }
+    } catch (e) {
+      debugPrint("[AuthWrapper] Error fetching Google user profile: $e");
+      // Don't fail the auth flow if profile fetch fails
     }
   }
 
