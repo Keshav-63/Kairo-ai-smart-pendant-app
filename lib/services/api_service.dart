@@ -6,7 +6,7 @@ import 'local_storage_service.dart'; // Your local storage service
 
 class ApiService {
   // Use localhost for simulators/emulators, replace with your actual backend IP/domain if needed
-  static const String _baseUrl = 'http://localhost:8000'; // Assuming your Python backend runs on port 8000
+  static const String _baseUrl = 'https://keshavsuthar-kairo-api.hf.space'; // Assuming your Python backend runs on port 8000
 
   // Creates a new chat session and returns the session_id
   Future<String?> createChatSession() async {

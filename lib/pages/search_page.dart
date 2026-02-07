@@ -482,7 +482,7 @@ class _SearchPageState extends State<SearchPage> {
                         style: GoogleFonts.inter(color: Colors.white60, fontSize: 11),
                       ),
                    );
-                }).toList(),
+                }),
               ]
            ],
         ),

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 
 class CalendarApiService {
-  final String _baseUrl = 'http://localhost:3001/api/calendar';
+  final String _baseUrl = 'https://shreeyanshsingh-raghuvanshi-kairob.hf.space/api/calendar';
 
   Future<List<dynamic>> listEvents() async {
     final storage = LocalStorageService.instance;
