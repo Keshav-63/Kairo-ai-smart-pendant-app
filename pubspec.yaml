@@ -1,7 +1,7 @@
 name: smart_pendant_app
 description: "A new Flutter project."
 publish_to: 'none' 
-version: 1.0.0+2
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.2.0 <4.0.0' # Check your Flutter version, this is a safe range
@@ -29,6 +29,7 @@ dependencies:
   wifi_iot: ^0.3.19
   wifi_scan: ^0.4.1+2 # For scanning for Wi-Fi networks
   flutter_markdown: ^0.7.3
+  intl: ^0.18.1 # For date formatting
 # Here is how you can implement a carousel for your app. The changes involve creating a new screen for the onboarding experience and updating your app's navigation flow to include it right after the login process.
 
 dev_dependencies:
@@ -36,7 +37,6 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.10.0
-  flutter_markdown: '^0.7.7+1'
 # ...existing code...
 
 

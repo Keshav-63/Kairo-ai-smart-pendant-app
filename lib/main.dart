@@ -62,6 +62,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smart_pendant_app/pages/profile_page.dart';
 import 'package:smart_pendant_app/pages/search_page.dart';
+import 'package:smart_pendant_app/pages/settings_page.dart';
+import 'package:smart_pendant_app/pages/tasks_page.dart';
+import 'package:smart_pendant_app/pages/recordings_page.dart';
+import 'package:smart_pendant_app/pages/kairo_plus_page.dart';
+import 'package:smart_pendant_app/pages/history_page.dart';
 import 'package:smart_pendant_app/screens/auth_wrapper.dart';
 import 'package:smart_pendant_app/screens/drive_files_screen.dart';
 import 'package:smart_pendant_app/screens/calendar_events_screen.dart';
@@ -74,6 +79,7 @@ import 'package:smart_pendant_app/screens/wifi_selection_screen.dart';
 import 'package:smart_pendant_app/screens/onboarding_carousel_screen.dart';
 import 'package:smart_pendant_app/screens/memories_screen.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
+import 'package:smart_pendant_app/constants/app_theme.dart';
 
 void main() async {
   // CRITICAL FIX: Ensures that plugin services are initialized before runApp()
@@ -94,22 +100,21 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF121212),
-        primaryColor: Colors.indigoAccent,
+        scaffoldBackgroundColor: AppTheme.primaryBackground,
+        primaryColor: AppTheme.primaryAccent,
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.indigoAccent,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+          style: AppTheme.primaryButtonStyle,
+        ),
+        appBarTheme: AppTheme.appBarTheme,
+        cardTheme: CardThemeData(
+          color: AppTheme.cardBackground,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.radiusM),
           ),
         ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
+        dividerColor: AppTheme.dividerColor,
       ),
       initialRoute: '/wrapper',
       routes: {
@@ -132,6 +137,11 @@ class MyApp extends StatelessWidget {
         '/drive_files': (context) => const DriveFilesScreen(),
         '/calendar_events': (context) => const CalendarEventsScreen(),
         '/memories': (context) => const MemoriesScreen(),
+        '/tasks': (context) => const TasksPage(),
+        '/recordings': (context) => const RecordingsPage(),
+        '/kairo_plus': (context) => const KairoPlusPage(),
+        '/history': (context) => const HistoryPage(),
+        '/settings': (context) => const SettingsPage(),
       },
     );
   }
