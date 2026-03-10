@@ -1,4 +1,4 @@
-# smart_pendant_app
+# Kairo - App
 
 A new Flutter project.
 
