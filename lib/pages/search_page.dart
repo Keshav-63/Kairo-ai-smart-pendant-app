@@ -351,7 +351,7 @@ class _SearchPageState extends State<SearchPage> {
      return Scaffold(
       drawer: const AppDrawer(),
       appBar: AppBar(
-        title: Text('Kairo AI', style: GoogleFonts.oxanium()),
+        title: Text('Ask Kairo', style: GoogleFonts.oxanium()),
         centerTitle: true,
         actions: [
           IconButton(
