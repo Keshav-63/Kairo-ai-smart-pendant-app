@@ -50,14 +50,13 @@ android {
         }
     }
 
-    // Rename APK outputs to include version name and code (e.g. app-release-v1.0.0+2.apk)
+    // Rename APK outputs to include version name (e.g. app-release-1.0.0.apk)
     applicationVariants.all {
         val variant = this
         variant.outputs.all {
             try {
                 val vName = variant.versionName ?: defaultConfig.versionName
-                val vCode = variant.versionCode ?: defaultConfig.versionCode
-                val newName = "app-${variant.name}-v${vName}+${vCode}.apk"
+                val newName = "app-${variant.name}-${vName}.apk"
                 (this as? com.android.build.gradle.internal.api.BaseVariantOutputImpl)?.outputFileName = newName
             } catch (e: Exception) {
                 // ignore on older AGP where internal API isn't present
