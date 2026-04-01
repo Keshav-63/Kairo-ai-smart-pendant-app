@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_pendant_app/services/local_storage_service.dart';
+import 'package:smart_pendant_app/utils/timezone_utils.dart';
 
 class MemoriesScreen extends StatefulWidget {
   const MemoriesScreen({super.key});
@@ -61,11 +62,11 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
       final List<dynamic> data = body is List ? body : [body];
 
       data.sort((a, b) {
-        final da = DateTime.tryParse(
-                a['created_at']?['\u0024date']?.toString() ?? '') ??
+        final da = AppTimeZone.parseToIst(
+          a['created_at']?['\u0024date']?.toString() ?? '') ??
             DateTime.fromMillisecondsSinceEpoch(0);
-        final db = DateTime.tryParse(
-                b['created_at']?['\u0024date']?.toString() ?? '') ??
+        final db = AppTimeZone.parseToIst(
+          b['created_at']?['\u0024date']?.toString() ?? '') ??
             DateTime.fromMillisecondsSinceEpoch(0);
         return db.compareTo(da);
       });
@@ -114,9 +115,11 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
           listContains(m['action_items']) ||
           listContains(m['key_quotes']);
 
-      final dateMatch = dateFilter.isEmpty ||
-          (m['created_at']?['\u0024date']?.toString() ?? '')
-              .startsWith(dateFilter);
+          final memoryDate = DateTime.tryParse(
+              m['created_at']?['\u0024date']?.toString() ?? '') ??
+          DateTime.fromMillisecondsSinceEpoch(0);
+        final dateMatch = dateFilter.isEmpty ||
+          AppTimeZone.istDateKey(memoryDate).startsWith(dateFilter);
 
       final sentimentLabel =
           (m['sentiment']?['label'] ?? '').toString().toLowerCase();
@@ -190,7 +193,7 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
                           children: [
                             Text(_formatDateHeader(dt), style: const TextStyle(color: Colors.white70)),
                             const SizedBox(width: 8),
-                            Text('•', style: const TextStyle(color: Colors.white24)),
+                            const Text('•', style: TextStyle(color: Colors.white24)),
                             const SizedBox(width: 8),
                             Text(_formatTime(dt), style: const TextStyle(color: Colors.white70)),
                             if (durationStr.isNotEmpty) ...[
@@ -377,12 +380,8 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
     final Map<String, List<dynamic>> groups = {};
     for (var m in filtered) {
       final createdRaw = m['created_at']?['\u0024date']?.toString() ?? '';
-      DateTime dt;
-      try {
-        dt = DateTime.parse(createdRaw);
-      } catch (_) {
-        dt = DateTime.fromMillisecondsSinceEpoch(0);
-      }
+      final dt = AppTimeZone.parseToIst(createdRaw) ??
+          DateTime.fromMillisecondsSinceEpoch(0);
       final header = _formatDateHeader(dt);
       groups.putIfAbsent(header, () => []).add(m);
     }
@@ -491,12 +490,8 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
 
   Widget _buildMemoryListTile(dynamic memory) {
     final createdRaw = memory['created_at']?['\u0024date']?.toString() ?? '';
-    DateTime dt;
-    try {
-      dt = DateTime.parse(createdRaw);
-    } catch (_) {
-      dt = DateTime.fromMillisecondsSinceEpoch(0);
-    }
+    final dt = AppTimeZone.parseToIst(createdRaw) ??
+        DateTime.fromMillisecondsSinceEpoch(0);
     final timeStr = _formatTime(dt);
     String duration = '';
     if (memory['duration_seconds'] != null) {
@@ -655,6 +650,7 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
                           borderRadius: BorderRadius.circular(10),
                           color: const Color(0xFF0D0D12),
                         ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             value: sentimentFilter,
@@ -677,7 +673,6 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
                             },
                           ),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
                       ),
                     ),
                   ],
