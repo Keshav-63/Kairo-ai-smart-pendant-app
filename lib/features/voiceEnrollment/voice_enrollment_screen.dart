@@ -352,12 +352,13 @@ class _VoiceEnrollmentScreenState extends State<VoiceEnrollmentScreen>
     return Container(
       padding: const EdgeInsets.all(AppTheme.spacingM),
       decoration: BoxDecoration(
-        gradient: AppTheme.accentGradient,
+        color: AppTheme.cardBackground,
         borderRadius: BorderRadius.circular(AppTheme.radiusL),
+        border: Border.all(color: Colors.white10),
       ),
       child: Row(
         children: [
-          const Icon(Icons.record_voice_over, color: Colors.white, size: 36),
+          const Icon(Icons.record_voice_over, color: AppTheme.primaryAccent, size: 36),
           const SizedBox(width: AppTheme.spacingM),
           Expanded(
             child: Column(
@@ -451,26 +452,24 @@ class _VoiceEnrollmentScreenState extends State<VoiceEnrollmentScreen>
                 height: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: isRecording
-                      ? const LinearGradient(
-                          colors: [Colors.redAccent, Color(0xFFFF6B6B)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                      : AppTheme.primaryGradient,
+                  color: isRecording ? Colors.redAccent : AppTheme.surfaceColor,
+                  border: Border.all(
+                    color: isRecording ? Colors.red : AppTheme.primaryAccent.withOpacity(0.5),
+                    width: 2,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: (isRecording ? Colors.red : AppTheme.primaryAccent)
-                          .withValues(alpha: 0.4),
-                      blurRadius: 24,
-                      spreadRadius: 4,
+                          .withOpacity(0.15),
+                      blurRadius: 16,
+                      spreadRadius: 2,
                     ),
                   ],
                 ),
                 child: Icon(
                   isRecording ? Icons.stop_rounded : Icons.mic,
                   size: 48,
-                  color: Colors.white,
+                  color: isRecording ? Colors.white : AppTheme.primaryAccent,
                 ),
               ),
             );
