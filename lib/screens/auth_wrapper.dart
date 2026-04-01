@@ -232,7 +232,6 @@ class _AuthWrapperState extends State<AuthWrapper> {
   Future<void> _checkStoredToken() async {
     debugPrint("[AuthWrapper] _checkStoredToken: Checking local storage for token...");
     final storage = LocalStorageService.instance;
-    final token = storage.getAuthToken();
     
     // Small delay to prevent race conditions during fast re-authentication
     await Future.delayed(const Duration(milliseconds: 100));
@@ -282,11 +281,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
       // Fetch user profile data from Google using access token
       await _fetchGoogleUserProfile(token);
 
-      final bool needsOnboarding = isNewUser || !storage.hasCompletedOnboarding();
-      
       if (isNewUser) {
         await storage.setHasCompletedOnboarding(false);
       }
+
+      final bool needsOnboarding = !storage.hasCompletedOnboarding();
       
       if (mounted) {
         debugPrint("[AuthWrapper] _handleAuthRedirect: Setting state to AUTHENTICATED.");

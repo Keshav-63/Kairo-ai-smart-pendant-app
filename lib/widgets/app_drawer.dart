@@ -60,7 +60,7 @@ class _AppDrawerState extends State<AppDrawer> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(top: 48, bottom: 24, left: 16, right: 16),
-            decoration: BoxDecoration(color: AppTheme.cardBackground),
+            decoration: const BoxDecoration(color: AppTheme.cardBackground),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

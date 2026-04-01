@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.compile.JavaCompile
+
 buildscript {
     repositories {
         google()
@@ -5,7 +7,7 @@ buildscript {
         maven { url = uri("https://plugins.gradle.org/m2/") }
     }
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0")
     }
 }
 
@@ -18,7 +20,7 @@ allprojects {
 }
 configurations.all {
     resolutionStrategy {
-        force("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
     }
 }
 
@@ -34,6 +36,14 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+subprojects {
+    tasks.withType<JavaCompile>().configureEach {
+        // Some transitive Android plugins still compile with source/target 1.8.
+        // Suppress JDK warnings for obsolete source/target to keep build logs clean.
+        options.compilerArgs.add("-Xlint:-options")
+    }
 }
 
 tasks.register<Delete>("clean") {

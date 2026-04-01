@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../services/local_storage_service.dart';
 import '../constants/app_theme.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:smart_pendant_app/utils/timezone_utils.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -268,7 +268,7 @@ class _HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
-        title: Text('Chat History', style: AppTheme.headingMedium),
+        title: const Text('Chat History', style: AppTheme.headingMedium),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -359,7 +359,7 @@ class _HistoryPageState extends State<HistoryPage> {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           width: _isSidebarMinimized ? 70 : 280,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppTheme.cardBackground,
             border: Border(
               right: BorderSide(color: AppTheme.dividerColor),
@@ -465,8 +465,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     subtitle: Text(
-                                      DateFormat('MMM dd, yyyy hh:mm a')
-                                          .format(chat.createdAt),
+                                      AppTimeZone.formatIst(
+                                          chat.createdAt,
+                                          'MMM dd, yyyy hh:mm a'),
                                       style: const TextStyle(
                                         color: Colors.white60,
                                         fontSize: 11,
@@ -483,7 +484,7 @@ class _HistoryPageState extends State<HistoryPage> {
         // Right side - Message display
         Expanded(
           child: _selectedChat == null
-              ? Center(
+              ? const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -492,8 +493,8 @@ class _HistoryPageState extends State<HistoryPage> {
                         size: 80,
                         color: Colors.white30,
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
+                      SizedBox(height: 16),
+                      Text(
                         'Select a conversation',
                         style: TextStyle(
                           color: Colors.white,
@@ -501,8 +502,8 @@ class _HistoryPageState extends State<HistoryPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
+                      SizedBox(height: 8),
+                      Text(
                         'Choose a chat from the left panel',
                         style: TextStyle(color: Colors.white60),
                       ),
@@ -595,7 +596,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 data: message.content,
                 styleSheet: MarkdownStyleSheet(
                   p: const TextStyle(color: Colors.white, fontSize: 14),
-                  code: TextStyle(
+                  code: const TextStyle(
                     color: Colors.greenAccent,
                     backgroundColor: Colors.black26,
                   ),
@@ -615,7 +616,7 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             const SizedBox(height: 4),
             Text(
-              DateFormat('hh:mm a').format(message.timestamp),
+              AppTimeZone.formatIst(message.timestamp, 'hh:mm a'),
               style: TextStyle(
                 color: isUser ? Colors.white70 : Colors.white60,
                 fontSize: 10,

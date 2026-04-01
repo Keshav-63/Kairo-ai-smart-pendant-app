@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:audioplayers/audioplayers.dart';
 import '../services/local_storage_service.dart';
 import '../constants/app_theme.dart';
-import 'package:intl/intl.dart';
+import 'package:smart_pendant_app/utils/timezone_utils.dart';
 
 class RecordingsPage extends StatefulWidget {
   const RecordingsPage({super.key});
@@ -21,7 +21,7 @@ class _RecordingsPageState extends State<RecordingsPage> {
   String _searchTerm = '';
   String _selectedFilter = 'all';
   String? _currentlyPlaying;
-  Map<String, double> _playbackProgress = {};
+  final Map<String, double> _playbackProgress = {};
   final Map<String, AudioPlayer> _audioPlayers = {};
 
   @override
@@ -182,7 +182,7 @@ class _RecordingsPageState extends State<RecordingsPage> {
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
-        title: Text('Recordings', style: AppTheme.headingMedium),
+        title: const Text('Recordings', style: AppTheme.headingMedium),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -215,9 +215,9 @@ class _RecordingsPageState extends State<RecordingsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Manage and play your recorded conversations',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white60,
               fontSize: 14,
             ),
@@ -353,7 +353,7 @@ class _RecordingsPageState extends State<RecordingsPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.mic_none,
               size: 80,
               color: Colors.white30,
@@ -606,14 +606,15 @@ class _RecordingsPageState extends State<RecordingsPage> {
   }
 
   String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date).inDays;
+    final now = AppTimeZone.toIst(DateTime.now());
+    final istDate = AppTimeZone.toIst(date);
+    final difference = now.difference(istDate).inDays;
 
     if (difference == 0) return 'Today';
     if (difference == 1) return 'Yesterday';
     if (difference < 7) return '$difference days ago';
     if (difference < 30) return '${(difference / 7).ceil()} weeks ago';
-    return DateFormat('MMM dd, yyyy').format(date);
+    return AppTimeZone.formatIst(date, 'MMM dd, yyyy');
   }
 }
 

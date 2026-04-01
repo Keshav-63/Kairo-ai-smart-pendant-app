@@ -51,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
-        title: Text('Profile', style: AppTheme.headingMedium),
+        title: const Text('Profile', style: AppTheme.headingMedium),
         actions: [
           TextButton(
             onPressed: () {
@@ -110,13 +110,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             const SizedBox(height: 32),
-            Text('Name', style: AppTheme.bodyMedium),
+            const Text('Name', style: AppTheme.bodyMedium),
             TextField(
               controller: _nameController,
               decoration: AppTheme.inputDecoration(hintText: 'Enter your name'),
             ),
             const SizedBox(height: 24),
-            Text('Gender', style: AppTheme.bodyMedium),
+            const Text('Gender', style: AppTheme.bodyMedium),
             Row(
               children: [
                 Expanded(
@@ -138,13 +138,13 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             const SizedBox(height: 24),
-            Text('Context for Pendant (Your Role)', style: AppTheme.bodyMedium),
+            const Text('Context for Pendant (Your Role)', style: AppTheme.bodyMedium),
             TextField(
               decoration: AppTheme.inputDecoration(hintText: 'e.g., Software Engineering Student'),
               maxLines: 2,
             ),
             const SizedBox(height: 24),
-            Text('Daily Tasks', style: AppTheme.bodyMedium),
+            const Text('Daily Tasks', style: AppTheme.bodyMedium),
             TextField(
               decoration: AppTheme.inputDecoration(hintText: 'e.g., Attending lectures, working on projects, team meetings...'),
               maxLines: 3,
