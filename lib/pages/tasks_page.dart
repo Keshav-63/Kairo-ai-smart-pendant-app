@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../services/local_storage_service.dart';
 import '../constants/app_theme.dart';
 import 'package:intl/intl.dart';
+import 'package:smart_pendant_app/utils/timezone_utils.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -18,7 +19,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
   List<Task> _pendingTasks = [];
   List<Task> _completedTasks = [];
   String _currentView = 'list'; // 'list' or 'calendar'
-  DateTime _currentMonth = DateTime.now();
+  DateTime _currentMonth = AppTimeZone.toIst(DateTime.now());
   late AnimationController _animationController;
 
   @override
@@ -131,7 +132,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
 
     for (var task in allTasks) {
       if (task.dueDateTime != null) {
-        final dateKey = DateFormat('yyyy-MM-dd').format(task.dueDateTime!);
+        final dateKey = AppTimeZone.istDateKey(task.dueDateTime!);
         tasksByDate.putIfAbsent(dateKey, () => []);
         tasksByDate[dateKey]!.add(task);
       }
@@ -155,7 +156,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
-        title: Text('Tasks & Reminders', style: AppTheme.headingMedium),
+        title: const Text('Tasks & Reminders', style: AppTheme.headingMedium),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -471,7 +472,10 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
                     const SizedBox(width: 4),
                     Text(
                       task.dueDateTime != null
-                          ? DateFormat('MMM dd, yyyy hh:mm a').format(task.dueDateTime!)
+                          ? AppTimeZone.formatIst(
+                              task.dueDateTime!,
+                              'MMM dd, yyyy hh:mm a',
+                            )
                           : 'No due date',
                       style: const TextStyle(
                         color: Colors.white60,
@@ -527,7 +531,7 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
           ),
           if (task.completedAt != null)
             Text(
-              DateFormat('MMM dd').format(task.completedAt!),
+              AppTimeZone.formatIst(task.completedAt!, 'MMM dd'),
               style: const TextStyle(
                 color: Colors.green,
                 fontSize: 11,
@@ -620,9 +624,10 @@ class _TasksPageState extends State<TasksPage> with SingleTickerProviderStateMix
                   DateTime(_currentMonth.year, _currentMonth.month, day),
                 );
                 final tasksForDay = tasksByDate[dateStr] ?? [];
-                final isToday = DateTime.now().day == day &&
-                    DateTime.now().month == _currentMonth.month &&
-                    DateTime.now().year == _currentMonth.year;
+                final nowIst = AppTimeZone.toIst(DateTime.now());
+                final isToday = nowIst.day == day &&
+                  nowIst.month == _currentMonth.month &&
+                  nowIst.year == _currentMonth.year;
 
                 return _buildCalendarDay(day, tasksForDay, isToday);
               },

@@ -112,7 +112,7 @@ class _KairoPlusPageState extends State<KairoPlusPage> {
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
-        title: Text('Kairo Plus Analytics', style: AppTheme.headingMedium),
+        title: const Text('Kairo Plus Analytics', style: AppTheme.headingMedium),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -194,17 +194,17 @@ class _KairoPlusPageState extends State<KairoPlusPage> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.analytics_outlined,
             size: 80,
             color: Colors.white30,
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16),
+          Text(
             'No Analytics Yet',
             style: TextStyle(
               color: Colors.white,
@@ -212,8 +212,8 @@ class _KairoPlusPageState extends State<KairoPlusPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
-          const Padding(
+          SizedBox(height: 8),
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 40.0),
             child: Text(
               'Once your sessions are processed, your Kairo Plus dashboard will appear here.',
@@ -234,7 +234,7 @@ class _KairoPlusPageState extends State<KairoPlusPage> {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           width: _isSidebarMinimized ? 70 : 280,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppTheme.cardBackground,
             border: Border(
               right: BorderSide(color: AppTheme.dividerColor),

@@ -9,7 +9,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppTheme.primaryBackground,
       appBar: AppBar(
-        title: Text('Settings', style: AppTheme.headingMedium),
+        title: const Text('Settings', style: AppTheme.headingMedium),
       ),
       body: ListView(
         children: [

@@ -173,6 +173,18 @@ class ChatMessage {
   final List<dynamic>? sources;
 
   ChatMessage({required this.text, required this.isUser, this.sources});
+
+  ChatMessage copyWith({
+    String? text,
+    bool? isUser,
+    List<dynamic>? sources,
+  }) {
+    return ChatMessage(
+      text: text ?? this.text,
+      isUser: isUser ?? this.isUser,
+      sources: sources ?? this.sources,
+    );
+  }
 }
 
 class SearchPage extends StatefulWidget {
@@ -269,29 +281,57 @@ class _SearchPageState extends State<SearchPage> {
       }
     }
 
+    late int assistantMessageIndex;
     setState(() {
       _isLoading = true;
       _chatHistory.add(ChatMessage(text: query, isUser: true));
+      _chatHistory.add(ChatMessage(text: '', isUser: false));
+      assistantMessageIndex = _chatHistory.length - 1;
       _queryController.clear();
     });
     _scrollToBottom();
 
     try {
-      final response = await _api_service_sendQueryWrapper(query, userId, _sessionId!);
+      final response = await _apiService.streamQuery(
+        query: query,
+        userId: userId,
+        sessionId: _sessionId!,
+        onToken: (token) {
+          if (!mounted) return;
+          if (assistantMessageIndex < 0 || assistantMessageIndex >= _chatHistory.length) {
+            return;
+          }
+
+          final current = _chatHistory[assistantMessageIndex];
+          setState(() {
+            _chatHistory[assistantMessageIndex] = current.copyWith(
+              text: current.text + token,
+            );
+          });
+          _scrollToBottom();
+        },
+      );
 
       if (mounted) {
         setState(() {
-          if (response != null && response['answer'] != null) {
-            _chatHistory.add(ChatMessage(
-              text: response['answer'],
-              isUser: false,
-              sources: response['sources'],
-            ));
+          if (response != null) {
+            final existing = _chatHistory[assistantMessageIndex];
+            final answer = (response['answer'] ?? '').toString();
+            final effectiveText = existing.text.isNotEmpty
+                ? existing.text
+                : (answer.isNotEmpty
+                    ? answer
+                    : "Sorry, I couldn't get a response. Please try again.");
+
+            _chatHistory[assistantMessageIndex] = existing.copyWith(
+              text: effectiveText,
+              sources: response['sources'] is List ? response['sources'] as List<dynamic> : null,
+            );
           } else {
-            _chatHistory.add(ChatMessage(
+            _chatHistory[assistantMessageIndex] =
+                _chatHistory[assistantMessageIndex].copyWith(
               text: "Sorry, I couldn't get a response. Please try again.",
-              isUser: false,
-            ));
+            );
           }
           _isLoading = false;
         });
@@ -300,10 +340,10 @@ class _SearchPageState extends State<SearchPage> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _chatHistory.add(ChatMessage(
+          _chatHistory[assistantMessageIndex] =
+              _chatHistory[assistantMessageIndex].copyWith(
             text: "An error occurred: ${e.toString()}",
-            isUser: false,
-          ));
+          );
           _isLoading = false;
         });
         _scrollToBottom();
@@ -311,24 +351,15 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  // Wrapper to call ApiService with safe null checks (keeps sendQuery usage isolated)
-  Future<Map<String, dynamic>?> _api_service_sendQueryWrapper(String query, String userId, String sessionId) async {
-    return await _apiService.sendQuery(
-      query: query,
-      userId: userId,
-      sessionId: sessionId,
-    );
-  }
-
    void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scroll_controller_animate();
+        _scrollControllerAnimate();
       }
     });
   }
 
-  void _scroll_controller_animate() {
+  void _scrollControllerAnimate() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
       duration: const Duration(milliseconds: 300),
