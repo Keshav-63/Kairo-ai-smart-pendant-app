@@ -73,6 +73,7 @@ import 'package:smart_pendant_app/screens/qr_scanner_screen.dart';
 import 'package:smart_pendant_app/screens/wifi_selection_screen.dart';
 import 'package:smart_pendant_app/screens/onboarding_carousel_screen.dart';
 import 'package:smart_pendant_app/screens/memories_screen.dart';
+import 'package:smart_pendant_app/features/voiceEnrollment/voice_enrollment_screen.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 
 void main() async {
@@ -132,6 +133,15 @@ class MyApp extends StatelessWidget {
         '/drive_files': (context) => const DriveFilesScreen(),
         '/calendar_events': (context) => const CalendarEventsScreen(),
         '/memories': (context) => const MemoriesScreen(),
+<<<<<<< Updated upstream
+=======
+        '/tasks': (context) => const TasksPage(),
+        '/recordings': (context) => const RecordingsPage(),
+        '/kairo_plus': (context) => const KairoPlusPage(),
+        '/history': (context) => const HistoryPage(),
+        '/settings': (context) => const SettingsPage(),
+        '/voice_enrollment': (context) => const VoiceEnrollmentScreen(),
+>>>>>>> Stashed changes
       },
     );
   }

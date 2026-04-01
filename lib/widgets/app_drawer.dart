@@ -100,6 +100,14 @@ class AppDrawer extends StatelessWidget {
                   },
                 ),
                 ListTile(
+                  leading: const Icon(Icons.record_voice_over_rounded, color: Color(0xFF7C6AF7)),
+                  title: Text('Voice Enrollment', style: GoogleFonts.oxanium()),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/voice_enrollment');
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.settings_outlined),
                   title: Text('Settings', style: GoogleFonts.oxanium()),
                   onTap: () {

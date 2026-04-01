@@ -236,6 +236,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
     await Future.delayed(const Duration(milliseconds: 100));
 
     if (mounted) {
+<<<<<<< Updated upstream
       final currentToken = storage.getAuthToken();
       if (currentToken != null && currentToken.isNotEmpty) {
         final hasCompleted = storage.hasCompletedOnboarding();
@@ -249,7 +250,27 @@ class _AuthWrapperState extends State<AuthWrapper> {
         setState(() {
           _authStatus = AuthStatus.unauthenticated;
         });
+=======
+      // TEMP BYPASS: Inject dummy user if not logged in to test without login
+      if (storage.getUserId() == null || storage.getAuthToken() == null) {
+        await storage.saveUserId('test_bypass_user');
+        await storage.saveAuthToken('dummy_bypass_token');
+        await storage.saveUserName('Tester');
+>>>>>>> Stashed changes
       }
+
+      final currentToken = storage.getAuthToken();
+      
+      // Auto-fetch profile if needed
+      final userName = storage.getUserName();
+      if ((userName == null || userName.isEmpty || userName == 'User') && currentToken != null && currentToken != 'dummy_bypass_token') {
+        await _fetchGoogleUserProfile(currentToken);
+      }
+      
+      setState(() {
+        _hasCompletedOnboarding = true; // Always skip onboarding
+        _authStatus = AuthStatus.authenticated; // Always authenticated
+      });
     }
   }
 
