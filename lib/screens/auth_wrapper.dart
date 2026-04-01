@@ -281,16 +281,13 @@ class _AuthWrapperState extends State<AuthWrapper> {
       // Fetch user profile data from Google using access token
       await _fetchGoogleUserProfile(token);
 
-      if (isNewUser) {
-        await storage.setHasCompletedOnboarding(false);
-      }
-
-      final bool needsOnboarding = !storage.hasCompletedOnboarding();
+      // Force onboarding bypass for all users
+      await storage.setHasCompletedOnboarding(true);
       
       if (mounted) {
         debugPrint("[AuthWrapper] _handleAuthRedirect: Setting state to AUTHENTICATED.");
         setState(() {
-          _hasCompletedOnboarding = !needsOnboarding;
+          _hasCompletedOnboarding = true;
           _authStatus = AuthStatus.authenticated;
         });
       }

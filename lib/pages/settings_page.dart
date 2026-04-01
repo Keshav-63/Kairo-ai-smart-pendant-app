@@ -13,6 +13,19 @@ class SettingsPage extends StatelessWidget {
       ),
       body: ListView(
         children: [
+          // ── Voice Enrollment entry point ──────────────────
+          ListTile(
+            leading: const Icon(Icons.record_voice_over, color: AppTheme.primaryAccent),
+            title: const Text('Enroll a Voice'),
+            subtitle: const Text(
+              'Register voices so Kairo knows who is speaking',
+              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+            ),
+            trailing: const Icon(Icons.chevron_right, color: AppTheme.textTertiary),
+            onTap: () => Navigator.pushNamed(context, '/voice_enrollment'),
+          ),
+          const Divider(color: AppTheme.dividerColor, height: 1),
+          // ─────────────────────────────────────────────────
           ListTile(
             leading: const Icon(Icons.wifi),
             title: const Text('Change Pendant Wi-Fi'),

@@ -174,9 +174,18 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
                   const SizedBox(height: 8),
                   Builder(builder: (context) {
                     final createdRaw = memory['created_at']?['\u0024date']?.toString() ?? '';
-                    final dt = AppTimeZone.parseToIst(createdRaw) ??
-                        DateTime.fromMillisecondsSinceEpoch(0);
-                    final durationStr = (memory['duration'] ?? memory['length'] ?? '').toString();
+                    DateTime dt;
+                    try {
+                      dt = DateTime.parse(createdRaw);
+                    } catch (_) {
+                      dt = DateTime.fromMillisecondsSinceEpoch(0);
+                    }
+                    String durationStr = '';
+                    if (memory['duration_seconds'] != null) {
+                      durationStr = _formatDuration(memory['duration_seconds']);
+                    } else {
+                      durationStr = (memory['duration'] ?? memory['length'] ?? '').toString();
+                    }
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -187,12 +196,15 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
                             const Text('•', style: TextStyle(color: Colors.white24)),
                             const SizedBox(width: 8),
                             Text(_formatTime(dt), style: const TextStyle(color: Colors.white70)),
+                            if (durationStr.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              const Text('•', style: TextStyle(color: Colors.white24)),
+                              const SizedBox(width: 8),
+                              Text(durationStr, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 12),
-                        if (durationStr.isNotEmpty)
-                          Text(durationStr, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                        const SizedBox(height: 6),
                       ],
                     );
                   }),
@@ -481,7 +493,12 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
     final dt = AppTimeZone.parseToIst(createdRaw) ??
         DateTime.fromMillisecondsSinceEpoch(0);
     final timeStr = _formatTime(dt);
-    final duration = (memory['duration'] ?? memory['length'] ?? '').toString();
+    String duration = '';
+    if (memory['duration_seconds'] != null) {
+      duration = _formatDuration(memory['duration_seconds']);
+    } else {
+      duration = (memory['duration'] ?? memory['length'] ?? '').toString();
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
@@ -681,4 +698,27 @@ class _MemoriesScreenState extends State<MemoriesScreen> {
       ),
     );
   }
+  String _formatDuration(dynamic durationSecondsRaw) {
+    if (durationSecondsRaw == null) return '';
+    final durationStr = durationSecondsRaw.toString();
+    if (durationStr.isEmpty) return '';
+    
+    final seconds = double.tryParse(durationStr)?.round() ?? 0;
+    if (seconds <= 0) return '';
+    
+    if (seconds < 60) {
+      return '${seconds}s';
+    } else if (seconds < 3600) {
+      final m = seconds ~/ 60;
+      final s = seconds % 60;
+      if (s == 0) return '${m}m';
+      return '${m}m ${s}s';
+    } else {
+      final h = seconds ~/ 3600;
+      final m = (seconds % 3600) ~/ 60;
+      if (m == 0) return '${h}h';
+      return '${h}h ${m}m';
+    }
+  }
+
 }

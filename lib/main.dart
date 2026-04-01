@@ -78,6 +78,7 @@ import 'package:smart_pendant_app/screens/qr_scanner_screen.dart';
 import 'package:smart_pendant_app/screens/wifi_selection_screen.dart';
 import 'package:smart_pendant_app/screens/onboarding_carousel_screen.dart';
 import 'package:smart_pendant_app/screens/memories_screen.dart';
+import 'package:smart_pendant_app/features/voiceEnrollment/voice_enrollment_screen.dart';
 import 'package:smart_pendant_app/services/local_storage_service.dart';
 import 'package:smart_pendant_app/constants/app_theme.dart';
 
@@ -142,6 +143,7 @@ class MyApp extends StatelessWidget {
         '/kairo_plus': (context) => const KairoPlusPage(),
         '/history': (context) => const HistoryPage(),
         '/settings': (context) => const SettingsPage(),
+        '/voice_enrollment': (context) => const VoiceEnrollmentScreen(),
       },
     );
   }

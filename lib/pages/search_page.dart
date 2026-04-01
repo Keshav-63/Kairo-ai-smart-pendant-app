@@ -496,25 +496,6 @@ class _SearchPageState extends State<SearchPage> {
                     styleSheet: markdownStyle,
                     selectable: true, // Allow text selection
                  ),
-              // Optionally display sources if they exist
-              if (message.sources != null && message.sources!.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  'Sources:',
-                  style: GoogleFonts.inter(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-                ...message.sources!.map((source) {
-                   final text = (source is Map && source.containsKey('text')) ? source['text'] ?? '' : source.toString();
-                   final snippet = text.length > 80 ? '${text.substring(0, 80)}...' : text;
-                   return Padding(
-                     padding: const EdgeInsets.only(top: 2.0),
-                     child: Text(
-                        '- $snippet', // Display longer snippet
-                        style: GoogleFonts.inter(color: Colors.white60, fontSize: 11),
-                      ),
-                   );
-                }),
-              ]
            ],
         ),
       ),

@@ -171,6 +171,14 @@ class _AppDrawerState extends State<AppDrawer> {
                   },
                 ),
                 ListTile(
+                  leading: const Icon(Icons.record_voice_over_rounded, color: Colors.white),
+                  title: Text('Voice Enrollment', style: GoogleFonts.oxanium()),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/voice_enrollment');
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.settings_outlined),
                   title: Text('Settings', style: GoogleFonts.oxanium()),
                   onTap: () {

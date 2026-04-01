@@ -81,8 +81,8 @@ class _RecordingsPageState extends State<RecordingsPage> {
     setState(() {
       _filteredRecordings = _recordings.where((recording) {
         final matchesSearch = _searchTerm.isEmpty ||
-            recording.title.toLowerCase().contains(_searchTerm.toLowerCase()) ||
-            recording.speaker.toLowerCase().contains(_searchTerm.toLowerCase());
+            recording.title.toLowerCase().contains(_searchTerm.toLowerCase());
+            // recording.speaker.toLowerCase().contains(_searchTerm.toLowerCase());
 
         final matchesFilter = _selectedFilter == 'all' ||
             recording.category == _selectedFilter;
@@ -449,19 +449,19 @@ class _RecordingsPageState extends State<RecordingsPage> {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(Icons.person, size: 16, color: Colors.white60),
-                    const SizedBox(width: 4),
-                    Text(
-                      recording.speaker,
-                      style: const TextStyle(color: Colors.white60, fontSize: 13),
-                    ),
-                    const SizedBox(width: 16),
-                    const Icon(Icons.access_time, size: 16, color: Colors.white60),
-                    const SizedBox(width: 4),
-                    Text(
-                      recording.duration,
-                      style: const TextStyle(color: Colors.white60, fontSize: 13),
-                    ),
+                    // const Icon(Icons.person, size: 16, color: Colors.white60),
+                    // const SizedBox(width: 4),
+                    // Text(
+                    //   recording.speaker,
+                    //   style: const TextStyle(color: Colors.white60, fontSize: 13),
+                    // ),
+                    // const SizedBox(width: 16),
+                    // const Icon(Icons.access_time, size: 16, color: Colors.white60),
+                    // const SizedBox(width: 4),
+                    // Text(
+                    //   recording.duration,
+                    //   style: const TextStyle(color: Colors.white60, fontSize: 13),
+                    // ),
                     const SizedBox(width: 16),
                     const Icon(Icons.calendar_today, size: 16, color: Colors.white60),
                     const SizedBox(width: 4),
@@ -623,8 +623,8 @@ class Recording {
   final String id;
   final String sessionId;
   final String title;
-  final String speaker;
-  final String duration;
+  // final String speaker;
+  // final String duration;
   final String size;
   final String quality;
   final String category;
@@ -636,8 +636,8 @@ class Recording {
     required this.id,
     required this.sessionId,
     required this.title,
-    required this.speaker,
-    required this.duration,
+    // required this.speaker,
+    // required this.duration,
     required this.size,
     required this.quality,
     required this.category,
@@ -651,8 +651,8 @@ class Recording {
       id: json['id'] ?? json['_id']?['\$oid'] ?? '',
       sessionId: json['sessionId'] ?? json['session_id'] ?? '',
       title: json['title'] ?? 'Untitled Recording',
-      speaker: json['speaker'] ?? 'Unknown',
-      duration: json['duration'] ?? '00:00',
+      // speaker: json['speaker'] ?? 'Unknown',
+      // duration: json['duration'] ?? '00:00',
       size: json['size'] ?? '0 MB',
       quality: json['quality'] ?? 'medium',
       category: json['category'] ?? 'personal',
