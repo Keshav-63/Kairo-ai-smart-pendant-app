@@ -1,4 +1,4 @@
-# Kairo - App
+# Kairo - Flutter App
 
 A new Flutter project.
 
