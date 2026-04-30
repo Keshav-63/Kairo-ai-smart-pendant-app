@@ -39,7 +39,7 @@ class _KairoPlusPageState extends State<KairoPlusPage> {
         throw Exception('User not logged in');
       }
 
-      // Fetch analytics summary
+      // Fetch analytics summary in kairo plus page
       const baseUrl = 'https://keshavsuthar-kairo-api.hf.space';
       final url = Uri.parse('$baseUrl/analytics/user/$userId/summary');
 
