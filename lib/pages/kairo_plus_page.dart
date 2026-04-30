@@ -54,7 +54,7 @@ class _KairoPlusPageState extends State<KairoPlusPage> {
           _isLoading = false;
         });
 
-        // Load the most recent day's details
+        // Load the most recent Day details.
         if (summaries.isNotEmpty) {
           await _fetchDailyAnalytics(summaries[0].date);
         }
