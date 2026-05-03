@@ -1,6 +1,6 @@
 //
-//  Generated file. Do not edit.
-//
+//  Generated file. Do not edit. 
+// RegisterPlugins
 
 // clang-format off
 
